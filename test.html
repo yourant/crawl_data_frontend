@@ -44,13 +44,13 @@
                 submitText: "查询",
                 target: 'data_table',
                 controls: [
-                    {
-                        "name": "token",
-                        "type": "text",
-                        "label": "Token",
-                        "required": true,
-                        'size': 'lg'
-                    },
+                    // {
+                    //     "name": "token",
+                    //     "type": "text",
+                    //     "label": "Token",
+                    //     "required": false,
+                    //     'size': 'lg'
+                    // },
                     {
                         "type": "button-group",
                         "name": "site",
@@ -128,7 +128,7 @@
                         "name": "sort",
                         "required": true,
                         "label": "排序",
-                        "value": 1,
+                        "value": 5,
                         "options": [
                             {
                                 "label": "ID",
@@ -146,11 +146,10 @@
                                 "label": "评论",
                                 "value": 4,
                             },
-                            // {
-                            //     "label": "上架时间",
-                            //     "value": 5,
-                            //     "visibleOn": "this.site == 1"
-                            // }
+                            {
+                                "label": "上架时间",
+                                "value": 5,
+                            }
                         ]
                     },
                     {
@@ -158,7 +157,7 @@
                         "name": "sort-desc",
                         "required": true,
                         "label": "排序顺序",
-                        "value": 1,
+                        "value": -1,
                         "options": [
                             {
                                 "label": "升序",
@@ -215,6 +214,7 @@
                             "label": "图片",
                             "type": 'image',
                             "thumbMode": 'cover',
+                            "enlargeAble": true
                         },
                         {
                             "name": "published_at",
