@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8"/>
+  <title>数据查询</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1"
+  />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+  <link rel="stylesheet" href="sdk.css"/>
+  <link rel="stylesheet" href="helper.css"/>
+  <!-- 从 1.1.0 开始 sdk.css 将不支持 IE 11，如果要支持 IE11 请引用这个 css，并把前面那个删了 -->
+  <!-- <link rel="stylesheet" href="sdk-ie11.css" /> -->
+  <!-- 不过 amis 开发团队几乎没测试过 IE 11 下的效果，所以可能有细节功能用不了，如果发现请报 issue -->
+  <style>
+      html,
+      body,
+      .app-wrapper {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          padding: 0;
+      }
+  </style>
+</head>
+<body>
+<div id="root" class="app-wrapper"></div>
+<script src="sdk.js"></script>
+<script type="text/javascript">
+    (function () {
+        let amis = amisRequire('amis/embed');
+        // 通过替换下面这个配置来生成不同页面
+        let amisJSON = {
+            type: 'page',
+            title: '数据查询',
+            body: [{
+                type: 'form',
+                name: 'query_form',
+                mode: 'horizontal',
+                title: "筛选条件",
+                submitText: "查询",
+                target: 'data_table',
+                controls: [
+                    {
+                        "name": "token",
+                        "type": "text",
+                        "label": "Token",
+                        "required": true,
+                        'size': 'lg'
+                    },
+                    {
+                        "type": "button-group",
+                        "name": "site",
+                        "label": "站点",
+                        "value": 1,
+                        "required": true,
+                        "options": [
+                            {
+                                "label": "shopcider",
+                                "value": 1
+                            },
+                            {
+                                "label": "shein",
+                                "value": 2
+                            },
+
+                        ]
+                    },
+                    {
+                        "type": "button-group",
+                        "name": "type",
+                        "label": "维度",
+                        "required": true,
+                        "value": 1,
+                        "options": [
+                            {
+                                "label": "全部",
+                                "value": 1
+                            },
+                            {
+                                "label": "上新",
+                                "value": 2
+                            },
+                            {
+                                "label": "热销",
+                                "value": 3,
+                            },
+                            {
+                                "label": "好评",
+                                "value": 4,
+                                "visibleOn": "this.site==2"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "分类",
+                        "type": "select",
+                        "required": true,
+                        "name": "category",
+                        "selectFirst": true,
+                        "visibleOn": "this.type != 1",
+                        "source": {
+                            "method": "post",
+                            "url": "http://127.0.0.1:8888/category",
+                            "dataType": "form",
+                            "data": {
+                                "site": "${site}",
+                                "token": "${token}"
+                            },
+                            "trackExpression": "${site}",
+                            "cache": 1800000
+
+                        },
+                    },
+                    {
+                        "type": "date",
+                        "name": "date",
+                        "label": "日期",
+                        "required": true,
+                        "value": "-1days",
+                        "visibleOn": "this.type != 1",
+                    },
+                    {
+                        "type": "button-group",
+                        "name": "sort",
+                        "required": true,
+                        "label": "排序",
+                        "value": 1,
+                        "options": [
+                            {
+                                "label": "ID",
+                                "value": 1
+                            },
+                            {
+                                "label": "价格",
+                                "value": 2
+                            },
+                            {
+                                "label": "评分",
+                                "value": 3,
+                            },
+                            {
+                                "label": "评论",
+                                "value": 4,
+                            },
+                            // {
+                            //     "label": "上架时间",
+                            //     "value": 5,
+                            //     "visibleOn": "this.site == 1"
+                            // }
+                        ]
+                    },
+                    {
+                        "type": "button-group",
+                        "name": "sort-desc",
+                        "required": true,
+                        "label": "排序顺序",
+                        "value": 1,
+                        "options": [
+                            {
+                                "label": "升序",
+                                "value": 1
+                            },
+                            {
+                                "label": "降序",
+                                "value": -1
+                            },
+                        ]
+                    },
+                    {
+                        "name": "keyword",
+                        "type": "text",
+                        "label": "名称",
+                        "required": false,
+                        "size": "lg",
+                        "clearable": true
+                    },
+                ],
+            },
+                {
+                    "type": "crud",
+                    'name': 'data_table',
+                    "api": {
+                        url: "http://127.0.0.1:8888/data",
+                        method: 'post',
+                        dataType: 'form'
+                    },
+                    "initFetch": false,
+                    "syncLocation": false,
+                    "affixHeader": false,
+                    "columnsTogglable": true,
+                    "defaultParams": {
+                        "perPage": 20,
+                    },
+                    "alwaysShowPagination": true,
+                    "autoJumpToTopOnPagerChange": true,
+                    "perPageAvailable": [10, 20, 50, 100],
+                    "headerToolbar": ["statistics", "pagination", "switch-per-page",],
+                    "footerToolbar": ["statistics", "pagination", "switch-per-page",],
+                    "columns": [
+                        {
+                            "name": "goods_id",
+                            "label": "商品ID"
+                        },
+                        {
+                            "name": "goods_name",
+                            "label": "名字",
+                            'copyable': true,
+                        },
+                        {
+                            "name": "goods_image",
+                            "label": "图片",
+                            "type": 'image',
+                            "thumbMode": 'cover',
+                        },
+                        {
+                            "name": "published_at",
+                            "label": "上线时间",
+                            'type': 'date',
+                            "valueFormat": "x",
+                            "format": "YYYY-MM-DD HH:mm:ss"
+                        },
+                        {
+                            "name": "price",
+                            "label": "价格"
+                        },
+                        {
+                            "name": "review",
+                            "label": "评论数"
+                        },
+                        {
+                            "name": "rating",
+                            "label": "评分"
+                        },
+                        {
+                            "name": "stock",
+                            "label": "库存"
+                        },
+                        {
+                            "name": "category",
+                            "label": "分类"
+                        },
+                        {
+                            "name": "goods_url",
+                            "label": "URL",
+                            "type": 'link',
+                            "body": '详情页',
+                            'copyable': true,
+                            'blank': true,
+                        }
+                    ]
+                }
+            ]
+        };
+        let amisScoped = amis.embed('#root', amisJSON, {}, {theme: 'default'});
+    })();
+</script>
+</body>
+</html>
